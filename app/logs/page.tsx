@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { useSearchParams } from "next/navigation";
 import { AdminShell } from "@/components/admin-shell";
+import { Card, CardContent } from "@/components/ui/card";
 import {
   Select,
   SelectContent,
@@ -11,6 +12,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { LogsDataTable, type LogEntry } from "./logs-data-table";
+import { ScrollText, Filter } from "lucide-react";
 
 interface Cliente {
   slug: string;
@@ -55,52 +57,81 @@ export default function LogsPage() {
       heading="Logs"
       subheading={activeCliente ? `Filtrando: ${activeCliente.name}` : "Histórico de requisições"}
     >
-      <div className="mx-auto max-w-4xl space-y-5">
+      <div className="mx-auto max-w-5xl space-y-6">
 
         {/* Filtro */}
-        <div className="flex items-center gap-3">
-          <span className="text-xs text-muted-foreground">Cliente:</span>
-          <Select
-            value={filterSlug || ALL}
-            onValueChange={(v) => setFilterSlug(v === ALL ? "" : v)}
-          >
-            <SelectTrigger className="h-8 w-[200px] text-xs">
-              <SelectValue placeholder="Todos" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value={ALL}>Todos</SelectItem>
-              {clientes.map((c) => (
-                <SelectItem key={c.slug} value={c.slug} className="text-xs">
-                  {c.name}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-          {!loading && (
-            <span className="text-xs text-muted-foreground">
-              {logs.length} registro(s)
-            </span>
-          )}
-        </div>
+        <Card>
+          <CardContent className="flex flex-col gap-4 py-4 sm:flex-row sm:items-center sm:justify-between">
+            <div className="flex items-center gap-3">
+              <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary/10">
+                <Filter className="h-4 w-4 text-primary" />
+              </div>
+              <div>
+                <label className="text-sm font-medium text-foreground">Filtrar por cliente</label>
+                <p className="text-xs text-muted-foreground">
+                  {activeCliente ? `Exibindo apenas logs de ${activeCliente.name}` : "Exibindo logs de todos os clientes"}
+                </p>
+              </div>
+            </div>
+            <div className="flex items-center gap-3">
+              <Select
+                value={filterSlug || ALL}
+                onValueChange={(v) => setFilterSlug(v === ALL ? "" : v)}
+              >
+                <SelectTrigger className="h-8 w-[220px]">
+                  <SelectValue placeholder="Todos os clientes" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value={ALL}>Todos os clientes</SelectItem>
+                  {clientes.map((c) => (
+                    <SelectItem key={c.slug} value={c.slug}>
+                      {c.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              {!loading && (
+                <span className="rounded-full bg-muted/80 px-3 py-1 text-sm font-medium text-muted-foreground">
+                  {logs.length} registro{logs.length !== 1 ? "s" : ""}
+                </span>
+              )}
+            </div>
+          </CardContent>
+        </Card>
 
         {/* Conteúdo */}
         {loading ? (
-          <div className="flex items-center justify-center py-16 text-sm text-muted-foreground">
-            <span className="h-4 w-4 animate-spin rounded-full border-2 border-muted-foreground/30 border-t-muted-foreground mr-2" />
-            Carregando...
-          </div>
+          <Card className="border-dashed">
+            <CardContent className="flex flex-col items-center justify-center py-20">
+              <div className="mb-4 h-12 w-12 animate-spin rounded-full border-2 border-muted-foreground/30 border-t-primary" />
+              <p className="text-sm font-medium text-foreground">Carregando logs...</p>
+              <p className="mt-1 text-xs text-muted-foreground">Aguarde um momento</p>
+            </CardContent>
+          </Card>
         ) : logs.length === 0 ? (
-          <div className="rounded-lg border border-dashed px-4 py-12 text-center text-sm text-muted-foreground">
-            Nenhum registro encontrado.
-          </div>
+          <Card className="border-dashed">
+            <CardContent className="flex flex-col items-center justify-center py-16 text-center">
+              <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-muted">
+                <ScrollText className="h-8 w-8 text-muted-foreground" />
+              </div>
+              <p className="text-base font-medium text-foreground">Nenhum registro encontrado</p>
+              <p className="mt-1 max-w-sm text-sm text-muted-foreground">
+                {activeCliente
+                  ? `Não há logs para ${activeCliente.name}. Tente outro cliente ou aguarde novas requisições.`
+                  : "Não há logs registrados. As requisições aparecerão aqui quando forem recebidas."}
+              </p>
+            </CardContent>
+          </Card>
         ) : (
-          <div className="rounded-lg border bg-card overflow-hidden">
-            <LogsDataTable
-              data={logs}
-              expandedId={expandedId}
-              onToggleExpand={setExpandedId}
-            />
-          </div>
+          <Card className="overflow-hidden">
+            <CardContent className="p-0">
+              <LogsDataTable
+                data={logs}
+                expandedId={expandedId}
+                onToggleExpand={setExpandedId}
+              />
+            </CardContent>
+          </Card>
         )}
 
       </div>

@@ -24,7 +24,7 @@ import {
   type ColumnFiltersState,
   type SortingState,
 } from "@tanstack/react-table";
-import { ArrowUpDown, AlertCircle } from "lucide-react";
+import { ArrowUpDown, AlertCircle, Search } from "lucide-react";
 
 export interface LogEntry {
   _id: string;
@@ -225,24 +225,27 @@ export function LogsDataTable({
   return (
     <div className="w-full space-y-4">
       {!hideClienteColumn && (
-        <div className="flex items-center gap-4">
-          <Input
-            placeholder="Filtrar por cliente..."
-            value={(table.getColumn("integrationSlug")?.getFilterValue() as string) ?? ""}
-            onChange={(e) =>
-              table.getColumn("integrationSlug")?.setFilterValue(e.target.value)
-            }
-            className="max-w-sm"
-          />
+        <div className="flex items-center gap-3 px-4 pt-4">
+          <div className="relative flex-1 max-w-xs">
+            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+            <Input
+              placeholder="Buscar por cliente..."
+              value={(table.getColumn("integrationSlug")?.getFilterValue() as string) ?? ""}
+              onChange={(e) =>
+                table.getColumn("integrationSlug")?.setFilterValue(e.target.value)
+              }
+              className="pl-9 h-9"
+            />
+          </div>
         </div>
       )}
-      <div className="overflow-x-auto rounded-md border">
+      <div className="overflow-x-auto">
         <Table>
-          <TableHeader>
+          <TableHeader className="bg-muted/50">
             {table.getHeaderGroups().map((headerGroup) => (
-              <TableRow key={headerGroup.id}>
+              <TableRow key={headerGroup.id} className="hover:bg-transparent">
                 {headerGroup.headers.map((header) => (
-                  <TableHead key={header.id}>
+                  <TableHead key={header.id} className="font-semibold">
                     {header.isPlaceholder
                       ? null
                       : flexRender(
@@ -293,10 +296,10 @@ export function LogsDataTable({
                         >
                           <div className="space-y-4 p-4">
                             <div>
-                              <p className="mb-2 text-sm font-medium text-muted-foreground">
-                                📥 Recebido (request)
+                              <p className="mb-2 text-sm font-medium text-foreground">
+                                Recebido (request)
                               </p>
-                              <pre className="overflow-auto rounded-lg border bg-muted/50 p-4 text-sm">
+                              <pre className="overflow-auto rounded-lg border bg-muted/50 p-4 text-sm font-mono">
                                 {JSON.stringify(
                                   row.original.request || {},
                                   null,
@@ -305,8 +308,8 @@ export function LogsDataTable({
                               </pre>
                             </div>
                             <div>
-                              <p className="mb-2 text-sm font-medium text-muted-foreground">
-                                📤 Retorno (response)
+                              <p className="mb-2 text-sm font-medium text-foreground">
+                                Retorno (response)
                               </p>
                               <pre
                                 className={`overflow-auto rounded-lg border p-4 text-sm ${
@@ -323,10 +326,10 @@ export function LogsDataTable({
                               </pre>
                             </div>
                             {missingIdConecteai && (
-                              <Alert variant="destructive">
+                              <Alert variant="destructive" className="mt-4">
                                 <AlertCircle className="h-4 w-4" />
                                 <AlertDescription>
-                                  ID ConecteAI não foi gerado pela API
+                                  ID ConecteAI não foi gerado pela API Completa
                                 </AlertDescription>
                               </Alert>
                             )}
@@ -350,9 +353,9 @@ export function LogsDataTable({
           </TableBody>
         </Table>
       </div>
-      <div className="flex flex-col gap-3 px-1 py-2 sm:flex-row sm:items-center sm:justify-between">
+      <div className="flex flex-col gap-4 px-4 pb-4 sm:flex-row sm:items-center sm:justify-between">
         <p className="text-sm text-muted-foreground">
-          {table.getFilteredRowModel().rows.length} log(s)
+          {table.getFilteredRowModel().rows.length} de {data.length} registro{data.length !== 1 ? "s" : ""}
         </p>
         <div className="flex shrink-0 gap-2">
           <Button
