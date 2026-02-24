@@ -29,7 +29,9 @@ export default function LogsPage() {
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => { if (slugFromUrl) setFilterSlug(slugFromUrl); }, [slugFromUrl]);
+  useEffect(() => {
+    if (slugFromUrl) setFilterSlug(slugFromUrl);
+  }, [slugFromUrl]);
 
   useEffect(() => {
     fetch("/api/integrations")
@@ -55,21 +57,32 @@ export default function LogsPage() {
   return (
     <AdminShell
       heading="Logs"
-      subheading={activeCliente ? `Filtrando: ${activeCliente.name}` : "Histórico de requisições"}
+      subheading={
+        activeCliente
+          ? `Filtrando: ${activeCliente.name}`
+          : "Histórico de requisições"
+      }
+      breadcrumbs={[
+        { label: "Dashboard", href: "/dashboard" },
+        { label: "Logs" },
+      ]}
     >
-      <div className="mx-auto max-w-5xl space-y-6">
-
-        {/* Filtro */}
-        <Card>
+      <div className="space-y-6">
+        {/* Filter bar */}
+        <Card className="border shadow-sm">
           <CardContent className="flex flex-col gap-4 py-4 sm:flex-row sm:items-center sm:justify-between">
             <div className="flex items-center gap-3">
               <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary/10">
                 <Filter className="h-4 w-4 text-primary" />
               </div>
               <div>
-                <label className="text-sm font-medium text-foreground">Filtrar por cliente</label>
+                <label className="text-sm font-medium text-foreground">
+                  Filtrar por cliente
+                </label>
                 <p className="text-xs text-muted-foreground">
-                  {activeCliente ? `Exibindo apenas logs de ${activeCliente.name}` : "Exibindo logs de todos os clientes"}
+                  {activeCliente
+                    ? `Exibindo apenas logs de ${activeCliente.name}`
+                    : "Exibindo logs de todos os clientes"}
                 </p>
               </div>
             </div>
@@ -78,7 +91,7 @@ export default function LogsPage() {
                 value={filterSlug || ALL}
                 onValueChange={(v) => setFilterSlug(v === ALL ? "" : v)}
               >
-                <SelectTrigger className="h-8 w-[220px]">
+                <SelectTrigger className="h-9 w-[240px]">
                   <SelectValue placeholder="Todos os clientes" />
                 </SelectTrigger>
                 <SelectContent>
@@ -91,7 +104,7 @@ export default function LogsPage() {
                 </SelectContent>
               </Select>
               {!loading && (
-                <span className="rounded-full bg-muted/80 px-3 py-1 text-sm font-medium text-muted-foreground">
+                <span className="rounded-full bg-muted px-3 py-1 text-sm font-medium text-muted-foreground">
                   {logs.length} registro{logs.length !== 1 ? "s" : ""}
                 </span>
               )}
@@ -99,22 +112,23 @@ export default function LogsPage() {
           </CardContent>
         </Card>
 
-        {/* Conteúdo */}
+        {/* Content */}
         {loading ? (
-          <Card className="border-dashed">
-            <CardContent className="flex flex-col items-center justify-center py-20">
-              <div className="mb-4 h-12 w-12 animate-spin rounded-full border-2 border-muted-foreground/30 border-t-primary" />
-              <p className="text-sm font-medium text-foreground">Carregando logs...</p>
-              <p className="mt-1 text-xs text-muted-foreground">Aguarde um momento</p>
-            </CardContent>
-          </Card>
+          <div className="flex items-center justify-center min-h-[40vh]">
+            <div className="flex items-center gap-3 text-muted-foreground">
+              <div className="h-5 w-5 animate-spin rounded-full border-2 border-muted-foreground/30 border-t-muted-foreground" />
+              Carregando logs...
+            </div>
+          </div>
         ) : logs.length === 0 ? (
           <Card className="border-dashed">
-            <CardContent className="flex flex-col items-center justify-center py-16 text-center">
+            <CardContent className="flex flex-col items-center justify-center py-20 text-center">
               <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-muted">
                 <ScrollText className="h-8 w-8 text-muted-foreground" />
               </div>
-              <p className="text-base font-medium text-foreground">Nenhum registro encontrado</p>
+              <p className="text-base font-medium text-foreground">
+                Nenhum registro encontrado
+              </p>
               <p className="mt-1 max-w-sm text-sm text-muted-foreground">
                 {activeCliente
                   ? `Não há logs para ${activeCliente.name}. Tente outro cliente ou aguarde novas requisições.`
@@ -123,7 +137,7 @@ export default function LogsPage() {
             </CardContent>
           </Card>
         ) : (
-          <Card className="overflow-hidden">
+          <Card className="overflow-hidden border shadow-sm">
             <CardContent className="p-0">
               <LogsDataTable
                 data={logs}
@@ -133,7 +147,6 @@ export default function LogsPage() {
             </CardContent>
           </Card>
         )}
-
       </div>
     </AdminShell>
   );

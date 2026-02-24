@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
-const protectedPaths = ["/clientes", "/logs", "/cliente"];
+const protectedPaths = ["/dashboard", "/clientes", "/logs", "/cliente"];
 const protectedApiPaths = ["/api/integrations", "/api/logs"];
 
 function isProtected(pathname: string): boolean {
@@ -18,7 +18,7 @@ function isAuthRoute(pathname: string): boolean {
   );
 }
 
-const reservedApiSegments = ["integrations", "logs", "auth", "config-proxy", "seed"];
+const reservedApiSegments = ["integrations", "logs", "auth", "config-proxy", "seed", "dashboard"];
 
 function isPublicApi(pathname: string): boolean {
   const match = pathname.match(/^\/api\/([^/]+)(?:\/([^/]+))?/);

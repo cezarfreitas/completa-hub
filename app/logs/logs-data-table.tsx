@@ -66,7 +66,8 @@ export function LogsDataTable({
   const [sorting, setSorting] = React.useState<SortingState>([
     { id: "createdAt", desc: true },
   ]);
-  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
+  const [columnFilters, setColumnFilters] =
+    React.useState<ColumnFiltersState>([]);
 
   const isDocumentacao = (req: Record<string, unknown>) =>
     !!(req?.id_conectai ?? req?.id_conecteai);
@@ -78,10 +79,16 @@ export function LogsDataTable({
             id: "tipo",
             header: "Tipo",
             cell: ({ row }: { row: { original: LogEntry } }) => {
-              const req = (row.original.request || {}) as Record<string, unknown>;
+              const req = (row.original.request || {}) as Record<
+                string,
+                unknown
+              >;
               const doc = isDocumentacao(req);
               return (
-                <Badge variant={doc ? "secondary" : "default"} className="text-xs">
+                <Badge
+                  variant={doc ? "secondary" : "default"}
+                  className="text-xs"
+                >
                   {doc ? "Documentação" : "Viabilidade"}
                 </Badge>
               );
@@ -93,17 +100,33 @@ export function LogsDataTable({
       ? [
           {
             accessorKey: "integrationSlug",
-            header: ({ column }: { column: { toggleSorting: (asc: boolean) => void; getIsSorted: () => string | false } }) => (
+            header: ({
+              column,
+            }: {
+              column: {
+                toggleSorting: (asc: boolean) => void;
+                getIsSorted: () => string | false;
+              };
+            }) => (
               <Button
                 variant="ghost"
-                onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-                className="-ml-3"
+                onClick={() =>
+                  column.toggleSorting(column.getIsSorted() === "asc")
+                }
+                className="-ml-3 font-semibold"
               >
                 Cliente
-                <ArrowUpDown className="ml-2 h-4 w-4" />
+                <ArrowUpDown className="ml-2 h-3.5 w-3.5" />
               </Button>
             ),
-            cell: ({ row }: { row: { original: LogEntry; getValue: (key: string) => string } }) => {
+            cell: ({
+              row,
+            }: {
+              row: {
+                original: LogEntry;
+                getValue: (key: string) => string;
+              };
+            }) => {
               const hasApiError = !!row.original.response?.error;
               const missingIdConecteai =
                 !hasApiError &&
@@ -111,13 +134,15 @@ export function LogsDataTable({
                 row.original.response?.Cobertura != null;
               const hasError = hasApiError || missingIdConecteai;
               return (
-                <div>
-                  <span className={`font-medium ${hasError ? "text-red-600" : ""}`}>
+                <div className="flex items-center gap-2">
+                  <span
+                    className={`font-medium ${hasError ? "text-red-600" : ""}`}
+                  >
                     {row.getValue("integrationSlug")}
                   </span>
                   {hasError && (
-                    <Badge variant="error" className="ml-2">
-                      {missingIdConecteai ? "⚠ Sem id_conecteai" : "Erro"}
+                    <Badge variant="error" className="text-[10px]">
+                      {missingIdConecteai ? "Sem ID" : "Erro"}
                     </Badge>
                   )}
                 </div>
@@ -136,7 +161,7 @@ export function LogsDataTable({
       cell: ({ row }) => {
         const r = row.original.request as Record<string, unknown>;
         const nome = (r?.nome ?? r?.Nome ?? "-") as string;
-        return <span className="text-muted-foreground">{nome}</span>;
+        return <span>{nome}</span>;
       },
     },
     {
@@ -157,11 +182,14 @@ export function LogsDataTable({
       header: "Status",
       cell: ({ row }) => {
         const req = (row.original.request || {}) as Record<string, unknown>;
-        const res = row.original.response as Record<string, unknown> | undefined;
+        const res = row.original.response as
+          | Record<string, unknown>
+          | undefined;
         const isDoc = isDocumentacao(req);
 
         if (isDoc) {
-          const ok = res?.ok === true || res?.message === "Documentação recebida";
+          const ok =
+            res?.ok === true || res?.message === "Documentação recebida";
           return (
             <Badge variant={ok ? "success" : "error"}>
               {ok ? "Recebido" : (res?.error as string) || "Erro"}
@@ -181,8 +209,8 @@ export function LogsDataTable({
             {hasApiError
               ? (res?.error as string) || "Erro"
               : missingIdConecteai
-              ? "Sem id_conecteai"
-              : (res?.Cobertura as string) || "OK"}
+                ? "Sem id_conecteai"
+                : (res?.Cobertura as string) || "OK"}
           </Badge>
         );
       },
@@ -193,10 +221,10 @@ export function LogsDataTable({
         <Button
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-          className="-ml-3"
+          className="-ml-3 font-semibold"
         >
           Data
-          <ArrowUpDown className="ml-2 h-4 w-4" />
+          <ArrowUpDown className="ml-2 h-3.5 w-3.5" />
         </Button>
       ),
       cell: ({ row }) => (
@@ -216,36 +244,47 @@ export function LogsDataTable({
     getPaginationRowModel: getPaginationRowModel(),
     getSortedRowModel: getSortedRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
-    state: {
-      sorting,
-      columnFilters,
-    },
+    state: { sorting, columnFilters },
   });
 
   return (
-    <div className="w-full space-y-4">
+    <div className="w-full">
       {!hideClienteColumn && (
-        <div className="flex items-center gap-3 px-4 pt-4">
-          <div className="relative flex-1 max-w-xs">
+        <div className="flex items-center gap-3 px-5 py-4">
+          <div className="relative flex-1 max-w-sm">
             <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
             <Input
               placeholder="Buscar por cliente..."
-              value={(table.getColumn("integrationSlug")?.getFilterValue() as string) ?? ""}
-              onChange={(e) =>
-                table.getColumn("integrationSlug")?.setFilterValue(e.target.value)
+              value={
+                (table
+                  .getColumn("integrationSlug")
+                  ?.getFilterValue() as string) ?? ""
               }
-              className="pl-9 h-9"
+              onChange={(e) =>
+                table
+                  .getColumn("integrationSlug")
+                  ?.setFilterValue(e.target.value)
+              }
+              className="pl-9"
             />
           </div>
+          <p className="ml-auto text-sm text-muted-foreground">
+            {table.getFilteredRowModel().rows.length} de {data.length} registro
+            {data.length !== 1 ? "s" : ""}
+          </p>
         </div>
       )}
+
       <div className="overflow-x-auto">
         <Table>
-          <TableHeader className="bg-muted/50">
+          <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
-              <TableRow key={headerGroup.id} className="hover:bg-transparent">
+              <TableRow
+                key={headerGroup.id}
+                className="bg-muted/40 hover:bg-muted/40"
+              >
                 {headerGroup.headers.map((header) => (
-                  <TableHead key={header.id} className="font-semibold">
+                  <TableHead key={header.id}>
                     {header.isPlaceholder
                       ? null
                       : flexRender(
@@ -271,8 +310,8 @@ export function LogsDataTable({
                 return (
                   <React.Fragment key={row.id}>
                     <TableRow
-                      className={`cursor-pointer ${
-                        hasError ? "border-l-4 border-l-red-200" : ""
+                      className={`cursor-pointer transition-colors ${
+                        hasError ? "border-l-4 border-l-red-300" : ""
                       }`}
                       onClick={() =>
                         onToggleExpand(isExpanded ? null : row.original._id)
@@ -292,14 +331,14 @@ export function LogsDataTable({
                       <TableRow>
                         <TableCell
                           colSpan={columns.length}
-                          className="bg-muted/30 p-0"
+                          className="bg-muted/20 p-0"
                         >
-                          <div className="space-y-4 p-4">
+                          <div className="grid gap-4 p-5 lg:grid-cols-2">
                             <div>
-                              <p className="mb-2 text-sm font-medium text-foreground">
-                                Recebido (request)
+                              <p className="mb-2 text-sm font-semibold text-foreground">
+                                Request
                               </p>
-                              <pre className="overflow-auto rounded-lg border bg-muted/50 p-4 text-sm font-mono">
+                              <pre className="overflow-auto rounded-lg border bg-card p-4 text-xs font-mono leading-relaxed">
                                 {JSON.stringify(
                                   row.original.request || {},
                                   null,
@@ -308,14 +347,14 @@ export function LogsDataTable({
                               </pre>
                             </div>
                             <div>
-                              <p className="mb-2 text-sm font-medium text-foreground">
-                                Retorno (response)
+                              <p className="mb-2 text-sm font-semibold text-foreground">
+                                Response
                               </p>
                               <pre
-                                className={`overflow-auto rounded-lg border p-4 text-sm ${
+                                className={`overflow-auto rounded-lg border p-4 text-xs font-mono leading-relaxed ${
                                   hasError
-                                    ? "border-red-200 bg-red-50"
-                                    : "bg-muted/50"
+                                    ? "border-red-200 bg-red-50/50"
+                                    : "bg-card"
                                 }`}
                               >
                                 {JSON.stringify(
@@ -326,12 +365,15 @@ export function LogsDataTable({
                               </pre>
                             </div>
                             {missingIdConecteai && (
-                              <Alert variant="destructive" className="mt-4">
-                                <AlertCircle className="h-4 w-4" />
-                                <AlertDescription>
-                                  ID ConecteAI não foi gerado pela API Completa
-                                </AlertDescription>
-                              </Alert>
+                              <div className="lg:col-span-2">
+                                <Alert variant="destructive">
+                                  <AlertCircle className="h-4 w-4" />
+                                  <AlertDescription>
+                                    ID ConecteAI não foi gerado pela API
+                                    Completa
+                                  </AlertDescription>
+                                </Alert>
+                              </div>
                             )}
                           </div>
                         </TableCell>
@@ -344,7 +386,7 @@ export function LogsDataTable({
               <TableRow>
                 <TableCell
                   colSpan={columns.length}
-                  className="h-24 text-center"
+                  className="h-24 text-center text-muted-foreground"
                 >
                   Nenhum resultado.
                 </TableCell>
@@ -353,11 +395,13 @@ export function LogsDataTable({
           </TableBody>
         </Table>
       </div>
-      <div className="flex flex-col gap-4 px-4 pb-4 sm:flex-row sm:items-center sm:justify-between">
+
+      <div className="flex items-center justify-between border-t px-5 py-3">
         <p className="text-sm text-muted-foreground">
-          {table.getFilteredRowModel().rows.length} de {data.length} registro{data.length !== 1 ? "s" : ""}
+          Página {table.getState().pagination.pageIndex + 1} de{" "}
+          {table.getPageCount()}
         </p>
-        <div className="flex shrink-0 gap-2">
+        <div className="flex gap-2">
           <Button
             variant="outline"
             size="sm"

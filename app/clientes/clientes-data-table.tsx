@@ -4,6 +4,7 @@ import * as React from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Badge } from "@/components/ui/badge";
 import {
   Table,
   TableBody,
@@ -23,7 +24,13 @@ import {
   type ColumnFiltersState,
   type SortingState,
 } from "@tanstack/react-table";
-import { ArrowUpDown, ExternalLink, Pencil, Search, Trash2 } from "lucide-react";
+import {
+  ArrowUpDown,
+  ExternalLink,
+  Pencil,
+  Search,
+  Trash2,
+} from "lucide-react";
 
 export interface Cliente {
   id: string;
@@ -52,7 +59,8 @@ export function ClientesDataTable({
   onRemove,
 }: ClientesDataTableProps) {
   const [sorting, setSorting] = React.useState<SortingState>([]);
-  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
+  const [columnFilters, setColumnFilters] =
+    React.useState<ColumnFiltersState>([]);
 
   const columns: ColumnDef<Cliente>[] = [
     {
@@ -61,13 +69,25 @@ export function ClientesDataTable({
         <Button
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-          className="-ml-3"
+          className="-ml-3 font-semibold"
         >
           Nome
-          <ArrowUpDown className="ml-2 h-4 w-4" />
+          <ArrowUpDown className="ml-2 h-3.5 w-3.5" />
         </Button>
       ),
-      cell: ({ row }) => <span className="font-medium">{row.getValue("name")}</span>,
+      cell: ({ row }) => (
+        <div className="flex items-center gap-3">
+          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-xs font-bold text-primary">
+            {(row.getValue("name") as string).charAt(0).toUpperCase()}
+          </div>
+          <Link
+            href={`/cliente/${row.original.slug}`}
+            className="font-medium hover:text-primary transition-colors"
+          >
+            {row.getValue("name")}
+          </Link>
+        </div>
+      ),
     },
     {
       accessorKey: "slug",
@@ -75,21 +95,34 @@ export function ClientesDataTable({
         <Button
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-          className="-ml-3"
+          className="-ml-3 font-semibold"
         >
           Slug
-          <ArrowUpDown className="ml-2 h-4 w-4" />
+          <ArrowUpDown className="ml-2 h-3.5 w-3.5" />
         </Button>
       ),
       cell: ({ row }) => (
-        <code className="rounded-md bg-muted/80 px-2.5 py-1 text-xs font-medium">{row.getValue("slug")}</code>
+        <code className="rounded-md bg-muted px-2.5 py-1 text-xs font-medium">
+          {row.getValue("slug")}
+        </code>
       ),
     },
     {
       accessorKey: "plan_id",
-      header: () => <span className="text-right">Plan ID</span>,
+      header: () => <span className="font-semibold">Plan ID</span>,
       cell: ({ row }) => (
-        <div className="text-right">{row.getValue("plan_id")}</div>
+        <Badge variant="secondary" className="font-mono">
+          {row.getValue("plan_id")}
+        </Badge>
+      ),
+    },
+    {
+      accessorKey: "endpoint",
+      header: () => <span className="font-semibold">Endpoint</span>,
+      cell: ({ row }) => (
+        <span className="truncate font-mono text-xs text-muted-foreground max-w-[300px] block">
+          {row.getValue("endpoint")}
+        </span>
       ),
     },
     {
@@ -98,8 +131,14 @@ export function ClientesDataTable({
       cell: ({ row }) => {
         const c = row.original;
         return (
-          <div className="flex items-center gap-0.5">
-            <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-primary" asChild title="Acessar cliente">
+          <div className="flex items-center justify-end gap-1">
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-8 w-8 text-muted-foreground hover:text-primary"
+              asChild
+              title="Acessar cliente"
+            >
               <Link href={`/cliente/${c.slug}`}>
                 <ExternalLink className="h-4 w-4" />
               </Link>
@@ -143,64 +182,82 @@ export function ClientesDataTable({
     getPaginationRowModel: getPaginationRowModel(),
     getSortedRowModel: getSortedRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
-    state: {
-      sorting,
-      columnFilters,
-    },
+    state: { sorting, columnFilters },
   });
 
   return (
-    <div className="w-full space-y-4">
-      <div className="flex items-center gap-3 px-4 pt-4">
-        <div className="relative flex-1 max-w-xs">
+    <div className="w-full">
+      <div className="flex items-center gap-3 px-5 py-4">
+        <div className="relative flex-1 max-w-sm">
           <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
           <Input
             placeholder="Buscar por nome..."
-            value={(table.getColumn("name")?.getFilterValue() as string) ?? ""}
-            onChange={(e) => table.getColumn("name")?.setFilterValue(e.target.value)}
-            className="pl-9 h-9"
+            value={
+              (table.getColumn("name")?.getFilterValue() as string) ?? ""
+            }
+            onChange={(e) =>
+              table.getColumn("name")?.setFilterValue(e.target.value)
+            }
+            className="pl-9"
           />
         </div>
+        <p className="ml-auto text-sm text-muted-foreground">
+          {table.getFilteredRowModel().rows.length} cliente
+          {table.getFilteredRowModel().rows.length !== 1 ? "s" : ""}
+        </p>
       </div>
-      <div className="rounded-none border-0">
-        <Table>
-          <TableHeader className="bg-muted/50">
-            {table.getHeaderGroups().map((headerGroup) => (
-              <TableRow key={headerGroup.id} className="hover:bg-transparent">
-                {headerGroup.headers.map((header) => (
-                  <TableHead key={header.id} className="font-semibold">
-                    {header.isPlaceholder
-                      ? null
-                      : flexRender(header.column.columnDef.header, header.getContext())}
-                  </TableHead>
+
+      <Table>
+        <TableHeader>
+          {table.getHeaderGroups().map((headerGroup) => (
+            <TableRow
+              key={headerGroup.id}
+              className="bg-muted/40 hover:bg-muted/40"
+            >
+              {headerGroup.headers.map((header) => (
+                <TableHead key={header.id}>
+                  {header.isPlaceholder
+                    ? null
+                    : flexRender(
+                        header.column.columnDef.header,
+                        header.getContext()
+                      )}
+                </TableHead>
+              ))}
+            </TableRow>
+          ))}
+        </TableHeader>
+        <TableBody>
+          {table.getRowModel().rows?.length ? (
+            table.getRowModel().rows.map((row) => (
+              <TableRow key={row.id} className="transition-colors">
+                {row.getVisibleCells().map((cell) => (
+                  <TableCell key={cell.id}>
+                    {flexRender(
+                      cell.column.columnDef.cell,
+                      cell.getContext()
+                    )}
+                  </TableCell>
                 ))}
               </TableRow>
-            ))}
-          </TableHeader>
-          <TableBody>
-            {table.getRowModel().rows?.length ? (
-              table.getRowModel().rows.map((row) => (
-                <TableRow key={row.id} className="transition-colors">
-                  {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id}>
-                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                    </TableCell>
-                  ))}
-                </TableRow>
-              ))
-            ) : (
-              <TableRow>
-                <TableCell colSpan={columns.length} className="h-24 text-center">
-                  Nenhum resultado.
-                </TableCell>
-              </TableRow>
-            )}
-          </TableBody>
-        </Table>
-      </div>
-      <div className="flex flex-col gap-4 px-4 pb-4 sm:flex-row sm:items-center sm:justify-between">
+            ))
+          ) : (
+            <TableRow>
+              <TableCell
+                colSpan={columns.length}
+                className="h-24 text-center text-muted-foreground"
+              >
+                Nenhum resultado.
+              </TableCell>
+            </TableRow>
+          )}
+        </TableBody>
+      </Table>
+
+      <div className="flex items-center justify-between border-t px-5 py-3">
         <p className="text-sm text-muted-foreground">
-          {table.getFilteredRowModel().rows.length} de {data.length} cliente{data.length !== 1 ? "s" : ""}
+          Página {table.getState().pagination.pageIndex + 1} de{" "}
+          {table.getPageCount()}
         </p>
         <div className="flex gap-2">
           <Button

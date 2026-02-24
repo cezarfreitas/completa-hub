@@ -4,8 +4,8 @@
 
 @layer base {
   :root {
-    /* ── Minimalista ── */
-    --background: 0 0% 98.5%;
+    /* ── Design System ── */
+    --background: 220 16% 96%;
     --foreground: 222 25% 12%;
 
     --card: 0 0% 100%;
@@ -21,7 +21,7 @@
     --secondary-foreground: 222 25% 12%;
 
     --muted: 220 14% 96%;
-    --muted-foreground: 220 10% 50%;
+    --muted-foreground: 220 10% 46%;
 
     --accent: 221 83% 96%;
     --accent-foreground: 221 83% 40%;
@@ -29,11 +29,17 @@
     --destructive: 0 72% 51%;
     --destructive-foreground: 0 0% 100%;
 
+    --success: 142 71% 45%;
+    --success-foreground: 0 0% 100%;
+
+    --warning: 38 92% 50%;
+    --warning-foreground: 0 0% 100%;
+
     --border: 220 13% 91%;
     --input: 220 13% 91%;
     --ring: 221 83% 53%;
 
-    --radius: 0.5rem;
+    --radius: 0.625rem;
 
     /* Sidebar escuro */
     --sidebar-bg: 222 30% 10%;
@@ -50,11 +56,11 @@
     @apply border-border;
   }
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground antialiased;
   }
 }
 
-/* Scrollbar customizado */
+/* Scrollbar */
 @layer utilities {
   .scrollbar-thin::-webkit-scrollbar {
     width: 6px;
