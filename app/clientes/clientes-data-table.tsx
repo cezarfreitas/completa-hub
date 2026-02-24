@@ -23,7 +23,7 @@ import {
   type ColumnFiltersState,
   type SortingState,
 } from "@tanstack/react-table";
-import { ArrowUpDown, ExternalLink, Pencil, Trash2 } from "lucide-react";
+import { ArrowUpDown, ExternalLink, Pencil, Search, Trash2 } from "lucide-react";
 
 export interface Cliente {
   id: string;
@@ -82,7 +82,7 @@ export function ClientesDataTable({
         </Button>
       ),
       cell: ({ row }) => (
-        <code className="rounded bg-muted px-2 py-0.5 text-xs">{row.getValue("slug")}</code>
+        <code className="rounded-md bg-muted/80 px-2.5 py-1 text-xs font-medium">{row.getValue("slug")}</code>
       ),
     },
     {
@@ -98,8 +98,8 @@ export function ClientesDataTable({
       cell: ({ row }) => {
         const c = row.original;
         return (
-          <div className="flex items-center gap-1">
-            <Button variant="ghost" size="icon" className="h-8 w-8" asChild title="Entrar no cliente">
+          <div className="flex items-center gap-0.5">
+            <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-primary" asChild title="Acessar cliente">
               <Link href={`/cliente/${c.slug}`}>
                 <ExternalLink className="h-4 w-4" />
               </Link>
@@ -107,7 +107,7 @@ export function ClientesDataTable({
             <Button
               variant="ghost"
               size="icon"
-              className="h-8 w-8"
+              className="h-8 w-8 text-muted-foreground hover:text-foreground"
               onClick={(e) => {
                 e.stopPropagation();
                 onEdit(c);
@@ -119,12 +119,12 @@ export function ClientesDataTable({
             <Button
               variant="ghost"
               size="icon"
-              className="h-8 w-8 text-red-600 hover:text-red-700 hover:bg-red-50"
+              className="h-8 w-8 text-muted-foreground hover:text-destructive hover:bg-destructive/10"
               onClick={(e) => {
                 e.stopPropagation();
                 onRemove(c.id, c.name);
               }}
-              title="Deletar"
+              title="Remover"
             >
               <Trash2 className="h-4 w-4" />
             </Button>
@@ -151,21 +151,24 @@ export function ClientesDataTable({
 
   return (
     <div className="w-full space-y-4">
-      <div className="flex items-center gap-4">
-        <Input
-          placeholder="Filtrar por nome..."
-          value={(table.getColumn("name")?.getFilterValue() as string) ?? ""}
-          onChange={(e) => table.getColumn("name")?.setFilterValue(e.target.value)}
-          className="max-w-sm"
-        />
+      <div className="flex items-center gap-3 px-4 pt-4">
+        <div className="relative flex-1 max-w-xs">
+          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+          <Input
+            placeholder="Buscar por nome..."
+            value={(table.getColumn("name")?.getFilterValue() as string) ?? ""}
+            onChange={(e) => table.getColumn("name")?.setFilterValue(e.target.value)}
+            className="pl-9 h-9"
+          />
+        </div>
       </div>
-      <div className="rounded-md border">
+      <div className="rounded-none border-0">
         <Table>
-          <TableHeader>
+          <TableHeader className="bg-muted/50">
             {table.getHeaderGroups().map((headerGroup) => (
-              <TableRow key={headerGroup.id}>
+              <TableRow key={headerGroup.id} className="hover:bg-transparent">
                 {headerGroup.headers.map((header) => (
-                  <TableHead key={header.id}>
+                  <TableHead key={header.id} className="font-semibold">
                     {header.isPlaceholder
                       ? null
                       : flexRender(header.column.columnDef.header, header.getContext())}
@@ -177,7 +180,7 @@ export function ClientesDataTable({
           <TableBody>
             {table.getRowModel().rows?.length ? (
               table.getRowModel().rows.map((row) => (
-                <TableRow key={row.id}>
+                <TableRow key={row.id} className="transition-colors">
                   {row.getVisibleCells().map((cell) => (
                     <TableCell key={cell.id}>
                       {flexRender(cell.column.columnDef.cell, cell.getContext())}
@@ -195,9 +198,9 @@ export function ClientesDataTable({
           </TableBody>
         </Table>
       </div>
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-4 px-4 pb-4 sm:flex-row sm:items-center sm:justify-between">
         <p className="text-sm text-muted-foreground">
-          {table.getFilteredRowModel().rows.length} cliente(s)
+          {table.getFilteredRowModel().rows.length} de {data.length} cliente{data.length !== 1 ? "s" : ""}
         </p>
         <div className="flex gap-2">
           <Button

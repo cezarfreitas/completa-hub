@@ -6,7 +6,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Plus, X } from "lucide-react";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Plus, X, Users, Link2 } from "lucide-react";
 import { ClientesDataTable, type Cliente } from "./clientes-data-table";
 
 const getEndpoints = (slug: string, origin: string) => {
@@ -26,10 +27,10 @@ const emptyForm = {
 
 function FieldGroup({ label, hint, children }: { label: string; hint?: string; children: React.ReactNode }) {
   return (
-    <div className="space-y-1.5">
-      <div>
-        <Label className="text-xs font-medium text-muted-foreground">{label}</Label>
-        {hint && <span className="ml-1.5 text-xs text-muted-foreground/60">{hint}</span>}
+    <div className="space-y-2">
+      <div className="flex items-center gap-2">
+        <Label className="text-sm font-medium text-foreground">{label}</Label>
+        {hint && <span className="text-xs text-muted-foreground">({hint})</span>}
       </div>
       {children}
     </div>
@@ -120,15 +121,14 @@ export default function GestaoClientesPage() {
       subheading="Gerencie clientes e seus endpoints"
       actions={
         !showForm ? (
-          <Button size="sm" onClick={() => setShowForm(true)}>
-            <Plus className="mr-1.5 h-3.5 w-3.5" />
-            Novo
+          <Button onClick={() => setShowForm(true)}>
+            <Plus className="mr-2 h-4 w-4" />
+            Novo cliente
           </Button>
         ) : undefined
       }
     >
-      <div className="mx-auto max-w-2xl space-y-6">
-
+      <div className="mx-auto max-w-4xl space-y-8">
         {message && (
           <Alert variant={message.type === "ok" ? "success" : "destructive"}>
             <AlertDescription>{message.text}</AlertDescription>
@@ -137,95 +137,120 @@ export default function GestaoClientesPage() {
 
         {/* Formulário */}
         {showForm && (
-          <div className="rounded-lg border bg-card p-5">
-            <div className="mb-5 flex items-start justify-between">
+          <Card className="border-2 shadow-md">
+            <CardHeader className="flex flex-row items-start justify-between space-y-0 pb-4">
               <div>
-                <h2 className="text-sm font-semibold text-foreground">
+                <CardTitle className="text-lg">
                   {editingId ? "Editar cliente" : "Novo cliente"}
-                </h2>
-                <p className="mt-0.5 text-xs text-muted-foreground">
-                  Preencha os dados para {editingId ? "atualizar" : "cadastrar"}
-                </p>
+                </CardTitle>
+                <CardDescription className="mt-1">
+                  Preencha os dados para {editingId ? "atualizar" : "cadastrar"} o cliente
+                </CardDescription>
               </div>
-              <button type="button" onClick={cancelForm} className="rounded p-1 text-muted-foreground hover:text-foreground">
+              <Button variant="ghost" size="icon" onClick={cancelForm} className="rounded-full">
                 <X className="h-4 w-4" />
-              </button>
-            </div>
-
-            <form onSubmit={handleSubmit} className="space-y-5">
-              {/* Identificação */}
-              <div className="grid gap-4 sm:grid-cols-2">
-                <FieldGroup label="Nome">
-                  <Input value={form.name} onChange={update("name")} required placeholder="Cliente ABC" className="h-9 text-sm" />
-                </FieldGroup>
-                <FieldGroup label="Slug" hint="(único, imutável)">
-                  <Input value={form.slug} onChange={update("slug")} required disabled={!!editingId} placeholder="cliente-abc" className="h-9 text-sm disabled:opacity-50" />
-                </FieldGroup>
-              </div>
-
-              {/* Preview de endpoints */}
-              {form.slug.trim() && (
-                <div className="rounded-md border bg-muted/30 px-3 py-2.5 space-y-1.5">
-                  <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">Endpoints gerados</p>
-                  {[eps.viabilidade, eps.documentacao].map((url) => (
-                    <div key={url} className="flex items-center gap-2 font-mono text-[11px]">
-                      <span className="shrink-0 rounded bg-primary/10 px-1 py-0.5 text-[9px] font-bold uppercase text-primary">POST</span>
-                      <span className="truncate text-foreground">{url}</span>
-                    </div>
-                  ))}
+              </Button>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <form onSubmit={handleSubmit} className="space-y-6">
+                <div className="grid gap-6 sm:grid-cols-2">
+                  <FieldGroup label="Nome">
+                    <Input value={form.name} onChange={update("name")} required placeholder="Ex: Cliente ABC" className="h-10" />
+                  </FieldGroup>
+                  <FieldGroup label="Slug" hint="único, imutável">
+                    <Input value={form.slug} onChange={update("slug")} required disabled={!!editingId} placeholder="cliente-abc" className="h-10 disabled:opacity-60" />
+                  </FieldGroup>
                 </div>
-              )}
 
-              {/* API */}
-              <div className="space-y-3">
-                <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">API Completa</p>
-                <FieldGroup label="URL da API">
-                  <Input type="url" value={form.completa_api_url} onChange={update("completa_api_url")} required placeholder="https://assine.completa.vc/api/v2/subscriptions" className="h-9 text-sm" />
-                </FieldGroup>
-                <FieldGroup label="Origin">
-                  <Input value={form.completa_origin} onChange={update("completa_origin")} required placeholder="https://..." className="h-9 text-sm" />
-                </FieldGroup>
-                <FieldGroup label="Plan ID">
-                  <Input type="number" value={form.plan_id} onChange={update("plan_id")} required className="h-9 w-32 text-sm" />
-                </FieldGroup>
-              </div>
+                {form.slug.trim() && (
+                  <div className="rounded-lg border bg-muted/50 p-4 space-y-2">
+                    <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
+                      <Link2 className="h-4 w-4" />
+                      Endpoints gerados
+                    </div>
+                    <div className="space-y-2 font-mono text-xs">
+                      {[eps.viabilidade, eps.documentacao].map((url) => (
+                        <div key={url} className="flex items-center gap-2 rounded bg-background/80 px-3 py-2">
+                          <span className="shrink-0 rounded bg-primary/15 px-2 py-0.5 text-[10px] font-semibold uppercase text-primary">POST</span>
+                          <span className="truncate text-foreground">{url}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
 
-              <div className="flex gap-2 pt-1">
-                <Button type="submit" size="sm" disabled={loading}>
-                  {loading ? "Salvando..." : editingId ? "Salvar" : "Cadastrar"}
-                </Button>
-                <Button type="button" variant="outline" size="sm" onClick={cancelForm}>
-                  Cancelar
-                </Button>
-              </div>
-            </form>
-          </div>
+                <div className="space-y-4 rounded-lg border p-4 bg-muted/30">
+                  <p className="text-sm font-medium text-foreground">API Completa</p>
+                  <div className="grid gap-4 sm:grid-cols-2">
+                    <FieldGroup label="URL da API">
+                      <Input type="url" value={form.completa_api_url} onChange={update("completa_api_url")} required placeholder="https://assine.completa.vc/api/v2/subscriptions" className="h-10" />
+                    </FieldGroup>
+                    <FieldGroup label="Origin">
+                      <Input value={form.completa_origin} onChange={update("completa_origin")} required placeholder="https://..." className="h-10" />
+                    </FieldGroup>
+                  </div>
+                  <FieldGroup label="Plan ID">
+                    <Input type="number" value={form.plan_id} onChange={update("plan_id")} required className="h-10 w-32" />
+                  </FieldGroup>
+                </div>
+
+                <div className="flex gap-3 pt-2">
+                  <Button type="submit" disabled={loading}>
+                    {loading ? "Salvando..." : editingId ? "Salvar alterações" : "Cadastrar cliente"}
+                  </Button>
+                  <Button type="button" variant="outline" onClick={cancelForm}>
+                    Cancelar
+                  </Button>
+                </div>
+              </form>
+            </CardContent>
+          </Card>
         )}
 
-        {/* Lista */}
-        <div className="space-y-3">
-          <div className="flex items-center justify-between">
-            <p className="text-[11px] font-semibold uppercase tracking-widest text-muted-foreground">
-              {clientes.length > 0 ? `${clientes.length} cliente(s)` : "Clientes"}
-            </p>
+        {/* Lista de clientes */}
+        <div className="space-y-4">
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <div className="flex items-center gap-2">
+              <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary/10">
+                <Users className="h-4 w-4 text-primary" />
+              </div>
+              <div>
+                <h2 className="text-base font-semibold text-foreground">
+                  {clientes.length > 0 ? `${clientes.length} cliente${clientes.length === 1 ? "" : "s"}` : "Lista de clientes"}
+                </h2>
+                <p className="text-xs text-muted-foreground">
+                  {clientes.length > 0 ? "Clique em um cliente para editar ou acessar" : "Cadastre seu primeiro cliente para começar"}
+                </p>
+              </div>
+            </div>
             {!showForm && clientes.length > 0 && (
-              <button type="button" onClick={() => setShowForm(true)} className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground">
-                <Plus className="h-3.5 w-3.5" /> Adicionar
-              </button>
+              <Button variant="outline" size="sm" onClick={() => setShowForm(true)}>
+                <Plus className="mr-1.5 h-4 w-4" />
+                Adicionar
+              </Button>
             )}
           </div>
 
           {clientes.length === 0 ? (
-            <div className="rounded-lg border border-dashed px-4 py-12 text-center">
-              <p className="text-sm text-muted-foreground">Nenhum cliente cadastrado.</p>
-              <button type="button" onClick={() => setShowForm(true)} className="mt-3 flex items-center gap-1.5 mx-auto text-xs text-primary hover:underline">
-                <Plus className="h-3.5 w-3.5" /> Cadastrar primeiro cliente
-              </button>
-            </div>
+            <Card className="border-dashed">
+              <CardContent className="flex flex-col items-center justify-center py-16 text-center">
+                <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-muted">
+                  <Users className="h-8 w-8 text-muted-foreground" />
+                </div>
+                <p className="text-base font-medium text-foreground">Nenhum cliente cadastrado</p>
+                <p className="mt-1 max-w-sm text-sm text-muted-foreground">
+                  Cadastre seu primeiro cliente para configurar os endpoints de integração.
+                </p>
+                <Button onClick={() => setShowForm(true)} className="mt-6">
+                  <Plus className="mr-2 h-4 w-4" />
+                  Cadastrar primeiro cliente
+                </Button>
+              </CardContent>
+            </Card>
           ) : (
-            <div className="rounded-lg border bg-card overflow-hidden">
+            <Card className="overflow-hidden">
               <ClientesDataTable data={clientes} onEdit={handleEdit} onRemove={handleRemove} />
-            </div>
+            </Card>
           )}
         </div>
 

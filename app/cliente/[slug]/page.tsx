@@ -19,6 +19,7 @@ import {
   CheckCircle2,
   XCircle,
   Activity,
+  ArrowLeft,
   Copy,
   TrendingUp,
   Check,
@@ -103,27 +104,29 @@ function CopyBtn({ text, label = "Copiar" }: { text: string; label?: string }) {
     } catch { /* ignore */ }
   };
   return (
-    <button
+    <Button
       type="button"
+      variant="outline"
+      size="sm"
       onClick={copy}
-      className="flex shrink-0 items-center gap-1.5 rounded-md border border-border bg-card px-2.5 py-1.5 text-xs text-muted-foreground transition-colors hover:text-foreground"
+      className="shrink-0 gap-1.5 text-xs"
     >
       {copied
-        ? <><Check className="h-3 w-3 text-green-600" /> Copiado</>
-        : <><Copy className="h-3 w-3" /> {label}</>
+        ? <><Check className="h-3.5 w-3.5 text-green-600" /> Copiado</>
+        : <><Copy className="h-3.5 w-3.5" /> {label}</>
       }
-    </button>
+    </Button>
   );
 }
 
 /* ─── Componente: linha de endpoint ─── */
 function EndpointRow({ method = "POST", url, onCopy }: { method?: string; url: string; onCopy: string }) {
   return (
-    <div className="flex items-center gap-2">
-      <span className="shrink-0 rounded bg-primary/10 px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-primary">
+    <div className="flex items-center gap-3 rounded-lg border bg-muted/30 px-3 py-2.5">
+      <span className="shrink-0 rounded-md bg-primary/15 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-primary">
         {method}
       </span>
-      <code className="min-w-0 flex-1 truncate text-xs text-foreground">{url}</code>
+      <code className="min-w-0 flex-1 truncate text-sm font-medium text-foreground">{url}</code>
       <CopyBtn text={onCopy} />
     </div>
   );
@@ -141,11 +144,11 @@ function Collapsible({
 }) {
   const [open, setOpen] = useState(defaultOpen);
   return (
-    <div>
+    <div className="rounded-lg border border-transparent hover:border-border/50 transition-colors">
       <button
         type="button"
         onClick={() => setOpen((o) => !o)}
-        className="flex w-full items-center gap-2 rounded-lg px-1 py-2 text-left text-sm font-medium text-foreground transition-colors hover:bg-muted/50"
+        className="flex w-full items-center gap-2 rounded-lg px-3 py-2.5 text-left text-sm font-medium text-foreground transition-colors hover:bg-muted/50"
       >
         {open
           ? <ChevronDown className="h-4 w-4 shrink-0 text-muted-foreground" />
@@ -153,7 +156,7 @@ function Collapsible({
         }
         {trigger}
       </button>
-      {open && <div className="mt-2">{children}</div>}
+      {open && <div className="mt-2 px-3 pb-3">{children}</div>}
     </div>
   );
 }
@@ -174,16 +177,16 @@ function InlineStat({
 }) {
   const pct = total && total > 0 ? Math.round((value / total) * 100) : null;
   return (
-    <div className="flex items-center gap-3 rounded-lg border bg-card px-4 py-3">
-      <div className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full ${color}`}>
+    <div className="flex items-center gap-4 rounded-xl border bg-card px-5 py-4 shadow-sm transition-shadow hover:shadow">
+      <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-lg ${color}`}>
         {icon}
       </div>
       <div className="min-w-0">
-        <p className="text-xs text-muted-foreground">{label}</p>
-        <p className="text-xl font-bold leading-none text-foreground">
+        <p className="text-xs font-medium text-muted-foreground">{label}</p>
+        <p className="mt-0.5 text-2xl font-bold leading-none text-foreground">
           {value}
           {pct !== null && (
-            <span className="ml-1.5 text-xs font-normal text-muted-foreground">{pct}%</span>
+            <span className="ml-2 text-sm font-normal text-muted-foreground">({pct}%)</span>
           )}
         </p>
       </div>
@@ -210,37 +213,44 @@ function LogSection({
   onToggleExpand: (id: string | null) => void;
 }) {
   return (
-    <div className="space-y-3">
-      {/* Cabeçalho da seção */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <div className="flex h-6 w-6 items-center justify-center rounded text-muted-foreground">
+    <div className="space-y-4">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex items-center gap-3">
+          <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10 text-primary">
             {icon}
           </div>
           <div>
-            <h3 className="text-sm font-semibold text-foreground">{title}</h3>
-            <p className="text-xs text-muted-foreground">{description}</p>
+            <h3 className="text-base font-semibold text-foreground">{title}</h3>
+            <p className="text-sm text-muted-foreground">{description}</p>
           </div>
         </div>
-        <span className="rounded-full border bg-muted/50 px-2.5 py-0.5 text-xs font-medium text-muted-foreground">
+        <span className="rounded-full border bg-muted/50 px-3 py-1 text-sm font-medium text-muted-foreground">
           {count} {count === 1 ? "registro" : "registros"}
         </span>
       </div>
 
       {logs.length === 0 ? (
-        <div className="rounded-lg border border-dashed bg-card px-4 py-8 text-center text-sm text-muted-foreground">
-          Nenhum registro ainda.
-        </div>
+        <Card className="border-dashed">
+          <CardContent className="flex flex-col items-center justify-center py-12 text-center">
+            <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-muted">
+              {icon}
+            </div>
+            <p className="text-sm font-medium text-foreground">Nenhum registro ainda</p>
+            <p className="mt-1 text-xs text-muted-foreground">As chamadas aparecerão aqui quando forem recebidas.</p>
+          </CardContent>
+        </Card>
       ) : (
-        <div className="rounded-lg border bg-card overflow-hidden p-4">
-          <LogsDataTable
-            data={logs}
-            expandedId={expandedId}
-            onToggleExpand={onToggleExpand}
-            hideTipoColumn
-            hideClienteColumn
-          />
-        </div>
+        <Card className="overflow-hidden">
+          <CardContent className="p-4">
+            <LogsDataTable
+              data={logs}
+              expandedId={expandedId}
+              onToggleExpand={onToggleExpand}
+              hideTipoColumn
+              hideClienteColumn
+            />
+          </CardContent>
+        </Card>
       )}
     </div>
   );
@@ -338,11 +348,10 @@ export default function ClientePortalPage() {
   if (loading) {
     return (
       <AdminShell heading="Carregando...">
-        <div className="flex items-center justify-center py-32">
-          <div className="flex items-center gap-3 text-sm text-muted-foreground">
-            <span className="h-4 w-4 animate-spin rounded-full border-2 border-muted-foreground/30 border-t-muted-foreground" />
-            Carregando dados do cliente...
-          </div>
+        <div className="flex flex-col items-center justify-center py-32">
+          <div className="mb-4 h-12 w-12 animate-spin rounded-full border-2 border-muted-foreground/30 border-t-primary" />
+          <p className="text-sm font-medium text-foreground">Carregando dados do cliente...</p>
+          <p className="mt-1 text-xs text-muted-foreground">Aguarde um momento</p>
         </div>
       </AdminShell>
     );
@@ -356,20 +365,24 @@ export default function ClientePortalPage() {
       subheading={`slug: ${cliente.slug}`}
       actions={
         <Button variant="outline" size="sm" asChild>
-          <Link href="/clientes">Voltar</Link>
+          <Link href="/clientes" className="flex items-center gap-2">
+            <ArrowLeft className="h-4 w-4" />
+            Voltar
+          </Link>
         </Button>
       }
     >
-      <div className="mx-auto max-w-3xl space-y-8">
+      <div className="mx-auto max-w-4xl space-y-10">
 
         {/* ── Stats ── */}
-        <div className="space-y-4">
+        <div className="space-y-6">
           {/* Viabilidade */}
-          <div className="space-y-2">
-            <p className="text-[11px] font-semibold uppercase tracking-widest text-muted-foreground">
+          <div className="space-y-3">
+            <h2 className="flex items-center gap-2 text-sm font-semibold uppercase tracking-wider text-muted-foreground">
+              <ClipboardList className="h-4 w-4" />
               Viabilidade
-            </p>
-            <div className="grid grid-cols-3 gap-2">
+            </h2>
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
               <InlineStat
                 label="Total"
                 value={sv.total}
@@ -394,11 +407,12 @@ export default function ClientePortalPage() {
           </div>
 
           {/* Documentação */}
-          <div className="space-y-2">
-            <p className="text-[11px] font-semibold uppercase tracking-widest text-muted-foreground">
+          <div className="space-y-3">
+            <h2 className="flex items-center gap-2 text-sm font-semibold uppercase tracking-wider text-muted-foreground">
+              <FileText className="h-4 w-4" />
               Documentação
-            </p>
-            <div className="grid grid-cols-3 gap-2">
+            </h2>
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
               <InlineStat
                 label="Total"
                 value={sd.total}
@@ -425,15 +439,18 @@ export default function ClientePortalPage() {
 
         {/* ── Gráfico (só se tiver dados) ── */}
         {chartData.length > 0 && (
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
-                <TrendingUp className="h-4 w-4" />
+          <Card className="overflow-hidden">
+            <CardHeader className="border-b bg-muted/30 pb-4">
+              <CardTitle className="flex items-center gap-2 text-base font-semibold">
+                <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10">
+                  <TrendingUp className="h-4 w-4 text-primary" />
+                </div>
                 Atividade por dia
               </CardTitle>
+              <p className="mt-1 text-sm text-muted-foreground">Sucessos e erros nas últimas chamadas</p>
             </CardHeader>
-            <CardContent>
-              <div className="h-[200px] w-full">
+            <CardContent className="pt-6">
+              <div className="h-[220px] w-full">
                 <ResponsiveContainer width="100%" height="100%">
                   <LineChart data={chartData} margin={{ top: 4, right: 16, left: -20, bottom: 0 }}>
                     <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
@@ -459,33 +476,41 @@ export default function ClientePortalPage() {
 
         {/* ── Integração (colapsável) ── */}
         <Card>
+          <CardHeader className="border-b bg-muted/30">
+            <CardTitle className="flex items-center gap-2 text-base font-semibold">
+              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10">
+                <Plug className="h-4 w-4 text-primary" />
+              </div>
+              Endpoints de integração
+            </CardTitle>
+            <p className="mt-1 text-sm text-muted-foreground">URLs e exemplos para testar as APIs</p>
+          </CardHeader>
           <CardContent className="divide-y divide-border p-0">
             {/* Linha rápida de endpoints – sempre visível */}
-            <div className="space-y-2 px-5 py-4">
-              <p className="mb-3 flex items-center gap-2 text-xs font-semibold uppercase tracking-widest text-muted-foreground">
-                <Plug className="h-3.5 w-3.5" />
-                Endpoints
-              </p>
-              <EndpointRow url={urlViabilidade}  onCopy={urlViabilidade} />
-              <EndpointRow url={urlDocumentacao} onCopy={urlDocumentacao} />
+            <div className="space-y-3 px-6 py-5">
+              <p className="text-sm font-medium text-foreground">URLs dos endpoints</p>
+              <div className="space-y-2">
+                <EndpointRow url={urlViabilidade}  onCopy={urlViabilidade} />
+                <EndpointRow url={urlDocumentacao} onCopy={urlDocumentacao} />
+              </div>
             </div>
 
             {/* Detalhes viabilidade – colapsável */}
-            <div className="px-5 py-3">
+            <div className="px-6 py-4">
               <Collapsible
                 trigger={
-                  <span className="text-xs text-muted-foreground">
+                  <span className="text-sm text-foreground">
                     Instruções — Viabilidade
                   </span>
                 }
               >
-                <div className="space-y-3 pl-6">
-                  <p className="text-xs text-muted-foreground">
+                <div className="space-y-4 pl-6">
+                  <p className="text-sm text-muted-foreground">
                     Envie um <strong>POST</strong> com o payload abaixo para consultar cobertura e gerar o{" "}
-                    <code className="text-[11px]">id_conecteai</code>.
+                    <code className="rounded bg-muted px-1.5 py-0.5 text-xs font-medium">id_conecteai</code>.
                   </p>
                   <div className="relative">
-                    <pre className="overflow-auto rounded-lg border bg-muted/30 p-3 text-xs font-mono leading-relaxed">
+                    <pre className="overflow-auto rounded-lg border bg-muted/50 p-4 text-xs font-mono leading-relaxed">
                       {payloadViabilidade}
                     </pre>
                     <div className="absolute right-2 top-2">
@@ -497,30 +522,30 @@ export default function ClientePortalPage() {
             </div>
 
             {/* Detalhes documentação – colapsável */}
-            <div className="px-5 py-3">
+            <div className="px-6 py-4">
               <Collapsible
                 trigger={
-                  <span className="text-xs text-muted-foreground">
+                  <span className="text-sm text-foreground">
                     Instruções — Documentação
                   </span>
                 }
               >
-                <div className="space-y-3 pl-6">
-                  <p className="text-xs text-muted-foreground">
+                <div className="space-y-4 pl-6">
+                  <p className="text-sm text-muted-foreground">
                     Após a viabilidade, envie um <strong>POST</strong> com os dados do assinante.
-                    Use o <code className="text-[11px]">id_conectai</code> retornado.
+                    Use o <code className="rounded bg-muted px-1.5 py-0.5 text-xs font-medium">id_conectai</code> retornado.
                   </p>
 
                   {/* Campos */}
                   <Collapsible
                     trigger={
-                      <span className="text-xs text-muted-foreground">
+                      <span className="text-sm text-foreground">
                         Ver todos os campos do payload
                       </span>
                     }
                   >
-                    <div className="overflow-auto rounded-lg border bg-card pl-4">
-                      <table className="w-full text-xs">
+                    <div className="overflow-auto rounded-lg border bg-muted/30">
+                      <table className="w-full text-sm">
                         <thead className="border-b">
                           <tr className="text-left text-muted-foreground">
                             <th className="px-2 py-2 font-medium">Campo</th>
@@ -547,7 +572,7 @@ export default function ClientePortalPage() {
                   </Collapsible>
 
                   <div className="relative">
-                    <pre className="overflow-auto rounded-lg border bg-muted/30 p-3 text-xs font-mono leading-relaxed">
+                    <pre className="overflow-auto rounded-lg border bg-muted/50 p-4 text-xs font-mono leading-relaxed">
                       {payloadDocumentacao}
                     </pre>
                     <div className="absolute right-2 top-2">
