@@ -11,7 +11,11 @@ function isProtected(pathname: string): boolean {
 }
 
 function isAuthRoute(pathname: string): boolean {
-  return pathname === "/" || pathname.startsWith("/api/auth");
+  return (
+    pathname === "/" ||
+    pathname.startsWith("/api/auth") ||
+    pathname === "/api/health"
+  );
 }
 
 const reservedApiSegments = ["integrations", "logs", "auth", "config-proxy", "seed"];

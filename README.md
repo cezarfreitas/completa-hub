@@ -61,6 +61,40 @@ npm run dev
 
 Acesse: http://localhost:3000
 
+## Deploy no EasyPanel (Docker)
+
+O projeto está pronto para deploy via Docker no [EasyPanel](https://easypanel.io).
+
+### 1. Criar projeto no EasyPanel
+
+- Crie um novo projeto e adicione um serviço do tipo **App**
+- Configure o repositório Git: `https://github.com/cezarfreitas/completa-hub.git`
+- Em **Build**, selecione **Dockerfile** e use o caminho: `Dockerfile` (raiz do projeto)
+
+### 2. Variáveis de ambiente
+
+Configure no painel **Environment** do EasyPanel:
+
+| Variável | Obrigatório | Descrição |
+|----------|-------------|-----------|
+| `GOOGLE_GEOCODE_API_KEY` | Sim | Chave da API Google Geocode |
+| `MONGODB_URI` | Sim | URI do MongoDB (ex: `mongodb://host:27017/completa`) |
+| `ADMIN_USER` | Não | Usuário do painel admin (padrão: `admin`) |
+| `ADMIN_PASSWORD` | Sim | Senha do painel admin (**obrigatório em produção**) |
+
+### 3. MongoDB
+
+O app precisa de um MongoDB acessível. No EasyPanel você pode:
+
+- Criar um serviço MongoDB no mesmo projeto
+- Ou usar um MongoDB externo (Atlas, etc.) e definir `MONGODB_URI` com a URI de conexão
+
+### 4. Deploy
+
+Clique em **Deploy** para fazer o build e subir o container. A aplicação ficará disponível na porta 3000.
+
+**Health check:** O endpoint `GET /api/health` retorna `{ status: "ok" }` e pode ser usado para verificação de disponibilidade.
+
 ## API
 
 **GET** `/api/integrations` – Lista clientes disponíveis
