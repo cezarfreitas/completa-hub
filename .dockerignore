@@ -37,3 +37,10 @@ yarn-error.log*
 # TypeScript
 *.tsbuildinfo
 next-env.d.ts
+
+# Build context cleanup
+Dockerfile
+README.md
+yarn.lock
+.claude
+CLAUDE.md
